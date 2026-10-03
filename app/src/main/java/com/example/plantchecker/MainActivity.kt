@@ -6,14 +6,11 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.material3.TextField
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
-// ============================================
-// LAZY: База данных создастся только при
-// первом обращении к переменной plantDatabase
-// ============================================
 val plantDatabase by lazy {
     println("🌱 База данных растений инициализирована!")
     mapOf(
@@ -34,19 +31,32 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun PlantCheckerScreen() {
-    // Буква захардкожена для демонстрации lazy + when
-    val inputLetter = "d"
 
-    // WHEN: Определяем растение по букве
-    val resultMessage = when (inputLetter.lowercase()) {
-        "d" -> "это ${plantDatabase["d"]}"
-        "r" -> "это ${plantDatabase["r"]}"
-        "p" -> "это ${plantDatabase["p"]}"
-        else -> "Растение не найдено"
-    }
+    var inputLetter by remember { mutableStateOf("") }
+    var resultMessage by remember { mutableStateOf("Введите букву растения") }
 
     Column(modifier = Modifier.padding(16.dp)) {
-        Text(text = "Введённая буква: $inputLetter")
-        Text(text = resultMessage)
+
+        TextField(
+            value = inputLetter,
+            onValueChange = { newText ->
+                inputLetter = newText
+
+                resultMessage = when (newText.lowercase()) {
+                    "d" -> "это ${plantDatabase["d"]}"
+                    "r" -> "это ${plantDatabase["r"]}"
+                    "p" -> "это ${plantDatabase["p"]}"
+                    ""  -> "Введите букву растения"
+                    else -> "Растение не найдено"
+                }
+            },
+            label = { Text("Введите букву") },
+            singleLine = true
+        )
+
+        Text(
+            text = resultMessage,
+            modifier = Modifier.padding(top = 16.dp)
+        )
     }
 }

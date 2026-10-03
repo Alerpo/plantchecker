@@ -12,31 +12,43 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
-// LAZY: База данных создастся только при первом обращении
 val plantDatabase by lazy {
     println("🌱 База данных растений инициализирована!")
     mapOf(
         "d" to "Дуб",
+        "D" to "Дуб",
         "r" to "Ромашка",
         "p" to "Папоротник"
     )
+}
+
+val LocalPlantDatabase = staticCompositionLocalOf<Map<String, String>> {
+    error("PlantDatabase не предоставлен! Оберните UI в CompositionLocalProvider.")
 }
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            PlantCheckerScreen()
+            AppRoot()
         }
     }
 }
 
 @Composable
+fun AppRoot() {
+    CompositionLocalProvider(LocalPlantDatabase provides plantDatabase) {
+        PlantCheckerScreen()
+    }
+}
+
+@Composable
 fun PlantCheckerScreen() {
-
     var inputLetter by rememberSaveable { mutableStateOf("") }
-
     var resultMessage by remember { mutableStateOf("Введите букву растения") }
+
+
+    val db = plantDatabase
 
     Column(modifier = Modifier.padding(16.dp)) {
 
@@ -45,10 +57,11 @@ fun PlantCheckerScreen() {
             onValueChange = { newText ->
                 inputLetter = newText
 
+
                 resultMessage = when (newText.lowercase()) {
-                    "d" -> "это ${plantDatabase["d"]}"
-                    "r" -> "это ${plantDatabase["r"]}"
-                    "p" -> "это ${plantDatabase["p"]}"
+                    "d" -> "это ${db["d"]}"
+                    "r" -> "это ${db["r"]}"
+                    "p" -> "это ${db["p"]}"
                     ""  -> "Введите букву растения"
                     else -> "Растение не найдено"
                 }

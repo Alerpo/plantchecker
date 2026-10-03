@@ -8,9 +8,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
+// LAZY: База данных создастся только при первом обращении
 val plantDatabase by lazy {
     println("🌱 База данных растений инициализирована!")
     mapOf(
@@ -32,7 +34,8 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun PlantCheckerScreen() {
 
-    var inputLetter by remember { mutableStateOf("") }
+    var inputLetter by rememberSaveable { mutableStateOf("") }
+
     var resultMessage by remember { mutableStateOf("Введите букву растения") }
 
     Column(modifier = Modifier.padding(16.dp)) {
